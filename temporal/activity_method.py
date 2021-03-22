@@ -48,10 +48,10 @@ def activity_method(func: Callable = None, name: str = "", schedule_to_close_tim
                     heartbeat_timeout: timedelta = None, task_queue: str = "", retry_parameters: RetryParameters = None):
     def wrapper(fn: Callable):
         # noinspection PyProtectedMember
-        async def stub_activity_fn(self, *args):
+        async def stub_activity_fn(self, *args, **kwargs):
             from .async_activity import Async
             from .decision_loop import ActivityFuture
-            future: ActivityFuture = Async.function_with_self(stub_activity_fn, self, *args)
+            future: ActivityFuture = Async.function_with_self(stub_activity_fn, self, *args, **kwargs)
             return await future.wait_for_result()
 
         if not task_queue:
