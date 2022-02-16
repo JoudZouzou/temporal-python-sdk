@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 @retry(logger=logger)
 async def activity_task_loop_func(worker: Worker):
     service: WorkflowService = worker.client.service
-    logger.info(f"Activity task worker started: {get_identity()}")
+    logger.info(f"[DEBUG] Activity task worker started: {get_identity()}")
     try:
         while True:
             if worker.is_stop_requested():
@@ -45,6 +45,9 @@ async def activity_task_loop_func(worker: Worker):
                 return
             except GRPCError as ex:
                 logger.error("Error invoking poll_activity_task_queue: %s", ex, exc_info=True)
+                continue
+            except Exception as e:
+                logger.info(f"polling failed 2 {e}")
                 continue
             task_token = task.task_token
             if not task_token:
