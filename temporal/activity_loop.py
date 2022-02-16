@@ -25,6 +25,7 @@ async def activity_task_loop_func(worker: Worker):
     try:
         while True:
             if worker.is_stop_requested():
+                logger.info("Stop requested")
                 return
             try:
                 polling_start = datetime.datetime.now()
@@ -38,8 +39,9 @@ async def activity_task_loop_func(worker: Worker):
                 task: PollActivityTaskQueueResponse
                 task = await service.poll_activity_task_queue(request=polling_request)
                 polling_end = datetime.datetime.now()
-                logger.debug("PollActivityTaskQueue: %dms", (polling_end - polling_start).total_seconds() * 1000)
-            except StopRequestedException:
+                logger.info("PollActivityTaskQueue: %dms", (polling_end - polling_start).total_seconds() * 1000)
+            except StopRequestedException as e:
+                logger.info(f"polling failed {e}")
                 return
             except GRPCError as ex:
                 logger.error("Error invoking poll_activity_task_queue: %s", ex, exc_info=True)
